@@ -1,0 +1,119 @@
+<ion-view view-title="Add ">
+
+<ion-content class="padding has-header">
+
+    <!-- <div id="map"></div> -->
+
+      <form  name="addForm" novalidate>
+        <ion-list>
+          <label  class="item item-input item-floating-label">
+            <span class="input-label">Name</span>
+            <input type="text" ng-model="masjid.name" name="name" placeholder="Name of the Masjid.." ng-required="true">
+            <p class="error validationerror" ng-show="addForm.name.$invalid && addForm.name.$touched ">Please enter a name for the masjid</p>
+          </label>
+
+          <label  class="item item-input item-floating-label">
+          <span class="input-label">Address</span>
+          <textarea name="address" ng-model="masjid.address" placeholder="Address" ng-required="true"></textarea>
+          <p class="error validationerror" ng-show="addForm.address.$invalid && addForm.address.$touched " ng-minlength="10">Please Enter a Address</p>
+          </label>
+          <label  class="item item-input item-floating-label">
+            <span class="input-label">Contact Number</span>
+            <input type="number" name="phno" ng-model="masjid.phno" placeholder="Contact Number" ng-minlength="8" ng-maxlength="12" >
+            <p class="error validationerror" ng-show="addForm.phno.$invalid && addForm.phno.$touched">Please Enter a Valid Phone Number.</p>
+          </label>
+
+          <div class="item item-divider">Exclusive</div>
+          <ion-radio value="Yes" ng-model="masjid.women">
+              <i class="radio-icon ion-checkmark-round"></i>
+              <div class="item-content">Yes</div>
+          </ion-radio>
+          <ion-radio value="No" ng-model="masjid.women">
+            <div class="item-content">No</div>
+              <i class="radio-icon ion-checkmark-round"></i>
+          </ion-radio>
+          <div class="item item-divider">Click the link below to add Timings..</div>
+          <button class="button button-clear button-balanced ion-android-add-circle" ng-click="modal.show()">
+            Add Prayer timing
+          </button>
+
+
+        </ion-list>
+
+      <!-- <label class="item item-input">
+        <input type="text" ng-model="masjid.name" name="name" placeholder="Name of the Masjid.." ng-required="true">
+        <p class="error validationerror" ng-show="addForm.name.$invalid && addForm.name.$touched ">Please enter a name for the masjid</p>
+        <input type="text" name="address" ng-model="masjid.address" placeholder="Address" ng-required="true">
+        <p class="error validationerror" ng-show="addForm.address.$invalid && addForm.address.$touched " ng-minlength="10">Please Enter a Address</p>
+        <input type="number" name="phno" ng-model="masjid.phno" placeholder="Contact Number" ng-minlength="8" ng-maxlength="12" >
+        <p class="error validationerror" ng-show="addForm.phno.$invalid && addForm.phno.$touched">Please Enter a Valid Phone Number.</p>
+      </label> -->
+</form>
+
+
+</ion-content>
+</ion-view>
+
+<script id="templates/AddPrayerTimeModal.html" type="text/ng-template">
+      <ion-modal-view>
+        <ion-header-bar class="bar bar-header bar-positive">
+          <h1 class="title">Add Time</h1>
+          <button class="button button-clear button-primary" ng-click="modal.hide()">Cancel</button>
+        </ion-header-bar>
+        <ion-content >
+          <form name="modalForm">
+          <div class="list list-inset">
+            <label class="item item-input item-wrapped-label">
+              <span class="input-label">Fajr</span>
+              <input ng-model="salah.fajr.adhaan" type="time" min="04:30:00" max="06:00:00" ng-required name="fajrmin">
+              <input ng-model="salah.fajr.ikhamath" type="time" min="04:30:00" max="06:00:00" ng-required name="fajr" >
+            </label>
+            <p class="error validationerror" ng-show="modalForm.fajrmin.$invalid && modalForm.fajrmin.$touched ">Enter a valid adhaan time for Fajr</p>
+            <p class="error validationerror" ng-show="modalForm.fajr.$invalid && modalForm.fajr.$touched ">Enter a valid ikamath time for Fajr</p>
+
+            <label class="item item-input item-wrapped-label">
+              <span class="input-label">Dhuhar</span>
+              <input ng-model="salah.dhuhar.adhaan" type="time" min="12:00:00" max="15:00:00" required name="dhuharAdhaan">
+              <input ng-model="salah.dhuhar.ikhamath" type="time" min="12:00:00" max="15:00:00" required name="dhuharIkamath">
+            </label>
+            <p class="error validationerror" ng-show="modalForm.dhuharAdhaan.$invalid && modalForm.dhuharAdhaan.$touched ">Enter a valid adhaan time for Dhuhar</p>
+            <p class="error validationerror" ng-show="modalForm.dhuharIkamath.$invalid && modalForm.dhuharIkamath.$touched ">Enter a valid ikamath time for Dhuhar</p>
+
+            <label class="item item-input item-wrapped-label">
+              <span class="input-label">Asar</span>
+              <input ng-model="salah.asar.adhaan" type="time" min="15:30:00" max="17:45:00" required name="asarAdhaan">
+              <input ng-model="salah.asar.ikhamath" type="time" min="15:30:00" max="17:45:00" required name="asarIkamath">
+            </label>
+            <p class="error validationerror" ng-show="modalForm.asarAdhaan.$invalid && modalForm.asarAdhaan.$touched ">Enter a valid adhaan time for Asar</p>
+            <p class="error validationerror" ng-show="modalForm.asarIkamath.$invalid && modalForm.asarIkamath.$touched ">Enter a valid ikamath time for Asar</p>
+
+            <label class="item item-input item-wrapped-label">
+              <span class="input-label">Maghrib</span>
+              <input ng-model="salah.maghrib.adhaan" type="time" min="17:45:00" max="19:15:00" required name="maghribAdhaan">
+              <input ng-model="salah.maghrib.ikhamath" type="time" min="17:45:00" max="19:15:00" required name="maghribIkamath">
+            </label>
+            <p class="error validationerror" ng-show="modalForm.maghribAdhaan.$invalid && modalForm.maghribAdhaan.$touched ">Enter a valid adhaan time for Maghrib</p>
+            <p class="error validationerror" ng-show="modalForm.maghribIkamath.$invalid && modalForm.maghribIkamath.$touched ">Enter a valid ikamath time for Maghrib</p>
+
+            <label class="item item-input item-wrapped-label">
+              <span class="input-label">Isha</span>
+              <input ng-model="salah.isha.adhaan" type="time" min="17:30:00" max="23:00:00" required name="ishaAdhaan">
+              <input ng-model="salah.isha.ikhamath" type="time" min="17:30:00" max="23:00:00" required name="ishaIkamath">
+            </label>
+            <p class="error validationerror" ng-show="modalForm.ishaAdhaan.$invalid && modalForm.ishaAdhaan.$touched ">Enter a valid adhaan time for Isha</p>
+            <p class="error validationerror" ng-show="modalForm.ishaIkamath.$invalid && modalForm.ishaIkamath.$touched ">Enter a valid ikamath time for Isha</p>
+
+            <label class="item item-input item-wrapped-label">
+              <span class="input-label">Jummah</span>
+              <input ng-model="salah.jummah.adhaan" type="time" min="12:00:00" max="15:00:00" required name="jummahKudhubah">
+              <input ng-model="salah.jummah.ikhamath" type="time" min="12:00:00" max="15:00:00" required name="jummahIkamath">
+            </label>
+            <p class="error validationerror" ng-show="modalForm.jummahKudhubah.$invalid && modalForm.jummahKudhubah.$touched ">Enter a valid kudhubah time for Jummah</p>
+            <p class="error validationerror" ng-show="modalForm.jummahIkamath.$invalid && modalForm.jummahIkamath.$touched ">Enter a valid ikamath time for Jummah</p>
+
+            <button class="button button-full button-positive" ng-click="closeModal();addPrayerTime(salah)">Add</button>
+          </div>
+        </form>
+        </ion-content>
+      </ion-modal-view>
+    </script>
