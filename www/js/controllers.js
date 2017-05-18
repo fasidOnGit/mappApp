@@ -55,7 +55,7 @@ angular.module('starter.controllers', [])
    });
 
    $scope.addPrayerTime=function(salah){
-     var posOptions = {timeout: 10000, enableHighAccuracy: false};
+     var posOptions = {frequency: 1000, timeout: 30000, enableHighAccuracy: false};
       $cordovaGeolocation
         .getCurrentPosition(posOptions)
         .then(function (position) {
@@ -64,6 +64,7 @@ angular.module('starter.controllers', [])
           console.log(lat +' , '+long);
         }, function(err) {
           // error
+          console.log(err);
         });
      console.log(salah);
      $scope.modal.hide();
