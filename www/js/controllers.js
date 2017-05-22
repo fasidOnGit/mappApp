@@ -1,6 +1,38 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function($scope) {})
+.controller('MapCtrl', function($scope , $state , $cordovaGeolocation) {
+  var options = {timeout : 10000 , enableHighAccuracy : true};
+  $cordovaGeolocation.getCurrentPosition(options).then(function(position){
+    //  var latlang=new google.maps.LatLang(position.coords.latitude , position.coords.longitude);
+    var LatLang = {lat : position.coords.latitude , lng : position.coords.longitude};
+    var mapOptions = {
+      center : LatLang,
+      zoom : 15,
+      mapTypeId : google.maps.MapTypeId.ROADMAP
+    };
+    $scope.map=new google.maps.Map(document.getElementById("map") , mapOptions);
+    google.maps.event.addListenerOnce($scope.map , 'idle' , function(){
+      var marker = new google.maps.Marker({
+        map : $scope.map,
+        animation : google.maps.Animation.DROP,
+        position : LatLang
+      });
+
+      var infoWindow = new google.maps.InfoWindow({
+        content : "You are Here"
+      });
+
+      google.maps.event.addListener(marker , 'click' , function(){
+        infoWindow.open($scope.map , marker);
+      })
+
+    })
+
+  } , function(err){
+    console.log(err);
+  });//$cordovaGeolocation
+
+})
 
 .controller('ChatsCtrl', function($scope, Chats) {
   // With the new view caching in Ionic, Controllers are only called

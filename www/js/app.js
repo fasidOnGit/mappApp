@@ -45,7 +45,7 @@ angular.module('starter', ['ngCordova','ionic', 'starter.controllers', 'starter.
     views: {
       'tab-dash': {
         templateUrl: 'templates/tab-dash.html',
-        controller: 'DashCtrl'
+        controller: 'MapCtrl'
       }
     }
   })
