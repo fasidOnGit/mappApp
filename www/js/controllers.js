@@ -53,6 +53,8 @@ angular.module('starter.controllers', [])
   $scope.chat = Chats.get($stateParams.chatId);
 })
 .controller('mAddCtrl' , ['$scope' , '$ionicModal' , '$cordovaGeolocation' ,'PrayerTimingService' ,function($scope , $ionicModal , $cordovaGeolocation , PrayerTimingService){
+  //Create DB Ref..
+  const dbRefObject = firebase.database().ref().child('masjid');
   // console.log($scope.masjid);
   $scope.masjid={};
   $ionicModal.fromTemplateUrl('templates/AddPrayerTimeModal.html' , {
@@ -91,6 +93,7 @@ angular.module('starter.controllers', [])
       console.log(PrayerTimingService.getSalah());
       masjid.salahTime=PrayerTimingService.getSalah();
       console.log(masjid);
+      dbRefObject.on('value' , snap =>console.log(snap.val()));
    }
    $scope.addPrayerTime=function(salah){
      var posOptions = {frequency: 1000, timeout: 30000, enableHighAccuracy: false};
@@ -118,4 +121,11 @@ angular.module('starter.controllers', [])
   $scope.settings = {
     enableFriends: true
   };
+  $scope.mList;
+  const dbRefObject = firebase.database().ref().child('masjid');
+  dbRefObject.on('value' , snap =>{
+    $scope.mList=JSON.stringify(snap.val() , null , 3);
+    console.log($scope.mList);
+  });
+
 });
