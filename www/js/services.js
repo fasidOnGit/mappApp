@@ -1,5 +1,22 @@
 angular.module('starter.services', [])
+.factory('PrayerTimingService' , function(){
 
+  var salahTiming={};
+  return {
+    setSalah : function(salah){
+        salahTiming=salah;
+    } ,
+    getSalah : function(){
+      if (salahTiming) {
+
+      return salahTiming;
+      } else{
+        return null;
+      }
+    }
+
+  }
+})
 .factory('Chats', function() {
   // Might use a resource here that returns a JSON array
 

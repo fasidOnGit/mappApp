@@ -52,8 +52,9 @@ angular.module('starter.controllers', [])
 .controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
   $scope.chat = Chats.get($stateParams.chatId);
 })
-.controller('mAddCtrl' , ['$scope' , '$ionicModal' , '$cordovaGeolocation' ,function($scope , $ionicModal , $cordovaGeolocation){
+.controller('mAddCtrl' , ['$scope' , '$ionicModal' , '$cordovaGeolocation' ,'PrayerTimingService' ,function($scope , $ionicModal , $cordovaGeolocation , PrayerTimingService){
   // console.log($scope.masjid);
+  $scope.masjid={};
   $ionicModal.fromTemplateUrl('templates/AddPrayerTimeModal.html' , {
     scope: $scope,
       animation: 'slide-in-up'
@@ -85,7 +86,12 @@ angular.module('starter.controllers', [])
    $scope.$on('modal.removed', function() {
       // Execute action
    });
-
+   $scope.submitMasjid=function(masjid){
+     console.log(masjid);
+      console.log(PrayerTimingService.getSalah());
+      masjid.salahTime=PrayerTimingService.getSalah();
+      console.log(masjid);
+   }
    $scope.addPrayerTime=function(salah){
      var posOptions = {frequency: 1000, timeout: 30000, enableHighAccuracy: false};
       $cordovaGeolocation
@@ -93,12 +99,15 @@ angular.module('starter.controllers', [])
         .then(function (position) {
           var lat  = position.coords.latitude
           var long = position.coords.longitude
+          salah.lat=lat;
+          salah.lng=long;
           console.log(lat +' , '+long);
         }, function(err) {
           // error
           console.log(err);
         });
-     console.log(salah);
+        console.log(salah);
+     PrayerTimingService.setSalah(salah);
      $scope.modal.hide();
    }
 
