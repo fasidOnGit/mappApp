@@ -1,5 +1,4 @@
-<ion-view view-title="Add ">
-
+<ion-view view-title="Add Masjid">
 <ion-content class="padding has-header">
 
     <!-- <div id="map"></div> -->
@@ -23,7 +22,7 @@
             <p class="error validationerror" ng-show="addForm.phno.$invalid && addForm.phno.$touched">Please Enter a Valid Phone Number.</p>
           </label>
 
-          <div class="item item-divider">Exclusive</div>
+          <div class="item item-divider">Seperate Places for Women?</div>
           <ion-radio value="Yes" ng-model="masjid.women">
               <i class="radio-icon ion-checkmark-round"></i>
               <div class="item-content">Yes</div>
@@ -37,8 +36,10 @@
             Add Prayer timing
           </button>
 
+          
 
         </ion-list>
+        <button class="button button-postive" ng-click="submitMasjid()">Submit Masjid</button>
 
       <!-- <label class="item item-input">
         <input type="text" ng-model="masjid.name" name="name" placeholder="Name of the Masjid.." ng-required="true">

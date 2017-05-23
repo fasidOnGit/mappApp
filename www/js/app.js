@@ -74,7 +74,7 @@ angular.module('starter', ['ngCordova','ionic', 'starter.controllers', 'starter.
     views: {
       'tab-account': {
         templateUrl: 'templates/tab-account.html',
-        controller: 'AccountCtrl'
+        controller: 'mAddCtrl'
       }
     }
   });

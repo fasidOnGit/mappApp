@@ -1,5 +1,4 @@
 {
-  "directory": "www/lib",
-  "proxy":"http://wwwgate0-sh.corp.mot.com:1080",
-  "https-proxy":"http://wwwgate0-sh.corp.mot.com:1080"
+  "directory": "www/lib"
+  
 }
