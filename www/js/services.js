@@ -1,4 +1,13 @@
 angular.module('starter.services', [])
+.factory('FirebaseArrayService' ,function($firebaseArray){
+  return {
+   getFirebaseArray:function($firebaseArray){
+      const ref = firebase.database().ref();
+    return $firebaseArray(ref);
+   }
+  }
+  
+})
 .factory('PrayerTimingService' , function(){
 
   var salahTiming={};

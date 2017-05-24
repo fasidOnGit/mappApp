@@ -52,7 +52,7 @@ angular.module('starter.controllers', [])
 .controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
   $scope.chat = Chats.get($stateParams.chatId);
 })
-.controller('mAddCtrl' , ['$scope' , '$ionicModal' , '$cordovaGeolocation' ,'PrayerTimingService' ,function($scope , $ionicModal , $cordovaGeolocation , PrayerTimingService){
+.controller('mAddCtrl' , ['$scope' , '$ionicModal' , '$cordovaGeolocation' ,'PrayerTimingService','$firebaseObject' ,'FirebaseArrayService' ,function($scope , $ionicModal , $cordovaGeolocation, $firebaseObject, PrayerTimingService ,FirebaseArrayService){
   //Create DB Ref..
   const dbRefObject = firebase.database().ref().child('masjid');
   // console.log($scope.masjid);
@@ -92,8 +92,13 @@ angular.module('starter.controllers', [])
      console.log(masjid);
       console.log(PrayerTimingService.getSalah());
       masjid.salahTime=PrayerTimingService.getSalah();
-      console.log(masjid);
-      dbRefObject.on('value' , snap =>console.log(snap.val()));
+      var firebaseArrayRef = FirebaseArrayService.getFirebaseArray();
+      firebaseArrayRef.$add(masjid).then(function(results){
+        var id=results.key();
+        console.log('Adding record with id '+ id);
+        console.log(results);
+        firebaseArrayRef.indexFor(id);
+      })
    }
    $scope.addPrayerTime=function(salah){
      var posOptions = {frequency: 1000, timeout: 30000, enableHighAccuracy: false};
@@ -115,13 +120,13 @@ angular.module('starter.controllers', [])
    }
 
 
-}])
+}])     
 
 .controller('AccountCtrl', function($scope) {
   $scope.settings = {
     enableFriends: true
   };
-  $scope.mList;
+
   const dbRefObject = firebase.database().ref().child('masjid');
   dbRefObject.on('value' , snap =>{
     $scope.mList=JSON.stringify(snap.val() , null , 3);
