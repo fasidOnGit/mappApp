@@ -52,8 +52,10 @@ angular.module('starter.controllers', [])
 .controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
   $scope.chat = Chats.get($stateParams.chatId);
 })
-.controller('mAddCtrl' , ['$scope' , '$ionicModal' , '$cordovaGeolocation' ,'PrayerTimingService','$firebaseObject' ,'FirebaseArrayService' ,function($scope , $ionicModal , $cordovaGeolocation, $firebaseObject, PrayerTimingService ,FirebaseArrayService){
-  //Create DB Ref..
+.controller('mAddCtrl' , ['$scope' , '$ionicModal' , '$cordovaGeolocation' ,'$firebaseObject' , '$firebaseArray' ,'PrayerTimingService' ,
+function($scope , $ionicModal , $cordovaGeolocation, $firebaseObject,$firebaseArray ,PrayerTimingService){
+  //Create DB Ref..l̥ṣ.`
+  
   const dbRefObject = firebase.database().ref().child('masjid');
   // console.log($scope.masjid);
   $scope.masjid={};
@@ -92,7 +94,7 @@ angular.module('starter.controllers', [])
      console.log(masjid);
       console.log(PrayerTimingService.getSalah());
       masjid.salahTime=PrayerTimingService.getSalah();
-      var firebaseArrayRef = FirebaseArrayService.getFirebaseArray();
+     firebaseArrayRef= $firebaseArray(dbRefObject);
       firebaseArrayRef.$add(masjid).then(function(results){
         var id=results.key();
         console.log('Adding record with id '+ id);
@@ -117,7 +119,7 @@ angular.module('starter.controllers', [])
         console.log(salah);
      PrayerTimingService.setSalah(salah);
      $scope.modal.hide();
-   }
+   };
 
 
 }])     

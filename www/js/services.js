@@ -1,14 +1,25 @@
 angular.module('starter.services', [])
-.factory('FirebaseArrayService' ,function($firebaseArray){
-  return {
-   getFirebaseArray:function($firebaseArray){
-      const ref = firebase.database().ref();
-    return $firebaseArray(ref);
-   }
-  }
+// .factory('FirebaseArrayService' ,function($firebaseArray){
+//   return {
+//    getFirebaseArray:function($firebaseArray){
+//       const ref = firebase.database().ref();
+//     return $firebaseArray(ref);
+//    }
+//   }
   
+// })
+.factory('GetterSetterService' , function(){
+  var factory = {};
+  factory.getter=function(){
+    return factory;
+  };
+
+  factory.setter=function(salah){
+    factory=salah;
+  }
+  return factory;
 })
-.factory('PrayerTimingService' , function(){
+.factory('PrayerTimingService' , [function(){
 
   var salahTiming={};
   return {
@@ -25,7 +36,7 @@ angular.module('starter.services', [])
     }
 
   }
-})
+}])
 .factory('Chats', function() {
   // Might use a resource here that returns a JSON array
 
