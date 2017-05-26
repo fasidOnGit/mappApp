@@ -8,16 +8,22 @@ angular.module('starter.services', [])
 //   }
   
 // })
-.factory('GetterSetterService' , function(){
-  var factory = {};
-  factory.getter=function(){
-    return factory;
-  };
+.factory('GetCurrentLocationService' , function($cordovaGeolocation){
+  var posOptions = {frequency: 1000, timeout: 30000, enableHighAccuracy: false};
+  var cordovaLocation=  $cordovaGeolocation
+  .getCurrentPosition(posOptions)
+  .then(function(position){
+    var location={};
+    location.lat = position.coords.latitude
+    location.lng = position.coords.longitude
+    return location;
+  }).catch(err => {
+    console.log(err);
+    return err;
+  });
 
-  factory.setter=function(salah){
-    factory=salah;
-  }
-  return factory;
+  return cordovaLocation;
+  
 })
 .factory('PrayerTimingService' , [function(){
 

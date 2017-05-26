@@ -52,8 +52,8 @@ angular.module('starter.controllers', [])
 .controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
   $scope.chat = Chats.get($stateParams.chatId);
 })
-.controller('mAddCtrl' , ['$scope' , '$ionicModal' , '$cordovaGeolocation' ,'$firebaseObject' , '$firebaseArray' ,'PrayerTimingService' ,
-function($scope , $ionicModal , $cordovaGeolocation, $firebaseObject,$firebaseArray ,PrayerTimingService){
+.controller('mAddCtrl' , ['$scope' , '$ionicModal' , '$cordovaGeolocation' ,'$firebaseObject' , '$firebaseArray' ,'PrayerTimingService' ,'GetCurrentLocationService',
+function($scope , $ionicModal , $cordovaGeolocation, $firebaseObject,$firebaseArray ,PrayerTimingService , GetCurrentLocationService){
   //Create DB Ref..l̥ṣ.`
   
   const dbRefObject = firebase.database().ref().child('masjid');
@@ -91,31 +91,19 @@ function($scope , $ionicModal , $cordovaGeolocation, $firebaseObject,$firebaseAr
       // Execute action
    });
    $scope.submitMasjid=function(masjid){
-     console.log(masjid);
+    
       console.log(PrayerTimingService.getSalah());
-      masjid.salahTime=PrayerTimingService.getSalah();
-     firebaseArrayRef= $firebaseArray(dbRefObject);
+      masjid.salahTime=PrayerTimingService.getSalah();   
+      masjid.lat=GetCurrentLocationService.$$state.value.lat;
+      masjid.lng=GetCurrentLocationService.$$state.value.lng;
+       console.log(masjid);
+      firebaseArrayRef= $firebaseArray(dbRefObject);
       firebaseArrayRef.$add(masjid).then(function(results){
-        var id=results.key();
-        console.log('Adding record with id '+ id);
         console.log(results);
-        firebaseArrayRef.indexFor(id);
       })
+      
    }
    $scope.addPrayerTime=function(salah){
-     var posOptions = {frequency: 1000, timeout: 30000, enableHighAccuracy: false};
-      $cordovaGeolocation
-        .getCurrentPosition(posOptions)
-        .then(function (position) {
-          var lat  = position.coords.latitude
-          var long = position.coords.longitude
-          salah.lat=lat;
-          salah.lng=long;
-          console.log(lat +' , '+long);
-        }, function(err) {
-          // error
-          console.log(err);
-        });
         console.log(salah);
      PrayerTimingService.setSalah(salah);
      $scope.modal.hide();
