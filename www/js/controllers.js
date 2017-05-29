@@ -55,7 +55,7 @@ angular.module('starter.controllers', [])
 .controller('mAddCtrl' , ['$scope' , '$ionicModal' , '$cordovaGeolocation' ,'$firebaseObject' , '$firebaseArray' ,'PrayerTimingService' ,'GetCurrentLocationService',
 function($scope , $ionicModal , $cordovaGeolocation, $firebaseObject,$firebaseArray ,PrayerTimingService , GetCurrentLocationService){
   //Create DB Ref..l̥ṣ.`
-  
+
   const dbRefObject = firebase.database().ref().child('masjid');
   // console.log($scope.masjid);
   $scope.masjid={};
@@ -91,9 +91,9 @@ function($scope , $ionicModal , $cordovaGeolocation, $firebaseObject,$firebaseAr
       // Execute action
    });
    $scope.submitMasjid=function(masjid){
-    
+
       console.log(PrayerTimingService.getSalah());
-      masjid.salahTime=PrayerTimingService.getSalah();   
+      masjid.salahTime=PrayerTimingService.getSalah();
       masjid.lat=GetCurrentLocationService.$$state.value.lat;
       masjid.lng=GetCurrentLocationService.$$state.value.lng;
        console.log(masjid);
@@ -101,7 +101,7 @@ function($scope , $ionicModal , $cordovaGeolocation, $firebaseObject,$firebaseAr
       firebaseArrayRef.$add(masjid).then(function(results){
         console.log(results);
       })
-      
+
    }
    $scope.addPrayerTime=function(salah){
         console.log(salah);
@@ -110,7 +110,7 @@ function($scope , $ionicModal , $cordovaGeolocation, $firebaseObject,$firebaseAr
    };
 
 
-}])     
+}])
 
 .controller('AccountCtrl', function($scope) {
   $scope.settings = {
@@ -122,5 +122,57 @@ function($scope , $ionicModal , $cordovaGeolocation, $firebaseObject,$firebaseAr
     $scope.mList=JSON.stringify(snap.val() , null , 3);
     console.log($scope.mList);
   });
+   var geoFire = new GeoFire(dbRefObject);
+  var fishLocations = [
+      [-16.130262, 153.605347],   // Coral Sea
+      [-66.722541, -167.019653],  // Southern Ocean
+      [-41.112469, 159.054565],   // Tasman Sea
+      [30.902225, -166.66809]     // North Pacific Ocean
+    ];
+
+    for (var i = 0; i < fishLocations.length; i++) {
+      geoFire.set("fish"+i ,fishLocations[i]).then(function(){
+          log(`fish${i} initially set to [${fishLocations[i]}]`);
+      }).catch(function(err){
+        console.log(err);
+      });
+    }
+    log("*** Updating locations ***");
+    newLocation = [-53.435719, 140.808716];
+    geoFire.set("fish1" , newLocation).then(function(){
+      log(`fish1 moved to [${newLocation}]`);
+    }).catch(function(err){
+      log(err);
+    });
+      newLocation = [56.83069, 1.94822];
+      geoFire.set("fish2" , newLocation).then(function(){
+        log(`fish2 moved to [${newLocation}]`);
+      }).catch(function(err){
+        log(err);
+      });
+      geoFire.remove("fish0").then(function(){
+        log("fish0 removed from GeoFire");
+      }).catch(function(err){
+        log(err);
+      });
+
+      document.getElementById("getFishLocation").addEventListener("click" , function(){
+        var selectedFishKey = document.getElementById("fishSelect").value;
+        geoFire.get(selectedFishKey).then(function(location){
+          if (location===null) {
+            log(`${selectedFishKey} is not in GeoFire`);
+          } else {
+            log(`${selectedFishKey} is at location [${location}]`);
+          }
+        })
+      })
 
 });
+
+
+function log(message){
+  var childDiv = document.createElement("div");
+  var textNode = document.createTextNode(message);
+  childDiv.appendChild(textNode);
+  document.getElementById("log").appendChild(childDiv);
+}

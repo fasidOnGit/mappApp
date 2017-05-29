@@ -4,8 +4,19 @@
     <ion-toggle  ng-model="settings.enableFriends">
         Enable Friends
     </ion-toggle>
-
+    <label class="item item-input item-select">
+      <div class="input-label">Favorite Pet</div>
+      <select id="fishSelect">
+        <option value="fish0">Fiash 0</option>
+        <option value="fish1">Fiash 1</option>
+        <option value="fish2">Fiash 2</option>
+        <option value="fish3">Fiash 3</option>
+      </select>
+      <input type="button" name="getLocation" value="Get Location" id="getFishLocation">
+    </label>
     </ion-list>
     <span>{{ mList }}</span>
+
+    <div id="log"></div>
   </ion-content>
 </ion-view>
