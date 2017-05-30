@@ -6,7 +6,7 @@ angular.module('starter.services', [])
 //     return $firebaseArray(ref);
 //    }
 //   }
-  
+
 // })
 .factory('GetCurrentLocationService' , function($cordovaGeolocation){
   var posOptions = {frequency: 1000, timeout: 30000, enableHighAccuracy: false};
@@ -21,9 +21,8 @@ angular.module('starter.services', [])
     console.log(err);
     return err;
   });
-
   return cordovaLocation;
-  
+
 })
 .factory('PrayerTimingService' , [function(){
 

@@ -1,16 +1,46 @@
 angular.module('starter.controllers', [])
 
-.controller('MapCtrl', function($scope , $state , $cordovaGeolocation) {
-  var options = {timeout : 10000 , enableHighAccuracy : true};
-  $cordovaGeolocation.getCurrentPosition(options).then(function(position){
-    //  var latlang=new google.maps.LatLang(position.coords.latitude , position.coords.longitude);
-    var LatLang = {lat : position.coords.latitude , lng : position.coords.longitude};
+.controller('MapCtrl', function($scope, $cordovaGeolocation ,GetCurrentLocationService) {
+  // var options = {timeout : 10000 , enableHighAccuracy : true};
+  // $cordovaGeolocation.getCurrentPosition(options).then(function(position){
+  //   //  var latlang=new google.maps.LatLang(position.coords.latitude , position.coords.longitude);
+  //
+  //
+  // } , function(err){
+  //   console.log(err);
+  // });//$cordovaGeolocation
+
+  GetCurrentLocationService.then(function(pos) {
+    var LatLang = {lat : pos.lat , lng : pos.lng};
+
+    console.log(LatLang);
+    // Wach Position for change
+        var watchOptions = {timeout : 3000, enableHighAccuracy: false};
+        var watch = $cordovaGeolocation.watchPosition(watchOptions);
+
+        watch.then(
+           function(position) {
+              var lat  = position.coords.latitude
+              var long = position.coords.longitude
+              console.log('watchPosition');
+              console.log(lat + '' + long)
+              LatLang.lat=lat;
+              LatLang.lng=long;
+           }
+        ).catch(err => {
+          console.log(err);
+        });
+
+        watch.clearWatch();
+
     var mapOptions = {
       center : LatLang,
       zoom : 15,
       mapTypeId : google.maps.MapTypeId.ROADMAP
     };
+
     $scope.map=new google.maps.Map(document.getElementById("map") , mapOptions);
+
     google.maps.event.addListenerOnce($scope.map , 'idle' , function(){
       var marker = new google.maps.Marker({
         map : $scope.map,
@@ -24,13 +54,15 @@ angular.module('starter.controllers', [])
 
       google.maps.event.addListener(marker , 'click' , function(){
         infoWindow.open($scope.map , marker);
-      })
+      });
 
-    })
-
-  } , function(err){
+    });
+  }).catch(function(err){
     console.log(err);
-  });//$cordovaGeolocation
+  });
+
+
+
 
 })
 
@@ -112,7 +144,7 @@ function($scope , $ionicModal , $cordovaGeolocation, $firebaseObject,$firebaseAr
 
 }])
 
-.controller('AccountCtrl', function($scope) {
+.controller('AccountCtrl', function($scope , $cordovaGeolocation) {
   $scope.settings = {
     enableFriends: true
   };
@@ -166,6 +198,34 @@ function($scope , $ionicModal , $cordovaGeolocation, $firebaseObject,$firebaseAr
           }
         })
       })
+      // CordovaWatchLocation
+      var posOptions = {timeout: 10000, enableHighAccuracy: false};
+  // $cordovaGeolocation
+  // .getCurrentPosition(posOptions)
+  //
+  // .then(function (position) {
+  //    var lat  = position.coords.latitude
+  //    var long = position.coords.longitude
+  //    console.log(lat + '   ' + long)
+  // }, function(err) {
+  //    console.log(err)
+  // });
+
+  var watchOptions = {timeout : 3000, enableHighAccuracy: false};
+  var watch = $cordovaGeolocation.watchPosition(watchOptions);
+
+  watch.then(
+     function(position) {
+        var lat  = position.coords.latitude
+        var long = position.coords.longitude
+        console.log('watchPosition');
+        console.log(lat + '' + long)
+     }
+  ).catch(err => {
+    console.log(err);
+  });
+
+  watch.clearWatch();
 
 });
 
