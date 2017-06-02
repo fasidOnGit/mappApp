@@ -42,10 +42,21 @@ angular.module('starter.controllers', [])
     $scope.map=new google.maps.Map(document.getElementById("map") , mapOptions);
 
     google.maps.event.addListenerOnce($scope.map , 'idle' , function(){
-      var marker = new google.maps.Marker({
+      var marker = new Marker({
         map : $scope.map,
         animation : google.maps.Animation.DROP,
-        position : LatLang
+        position : LatLang ,
+        icon: {
+  		path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+  		fillColor: '#0c60ee',
+  		fillOpacity: 1,
+  		strokeColor: '',
+  		strokeWeight: 0,
+      scale: 5
+
+  	}
+  	// map_icon_label: '<span class="map-icon map-icon-location-arrow"></span>'
+
       });
 
       var infoWindow = new google.maps.InfoWindow({
