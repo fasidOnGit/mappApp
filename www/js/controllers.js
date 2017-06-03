@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('MapCtrl', function($scope, $cordovaGeolocation ,GetCurrentLocationService) {
+.controller('MapCtrl', function($scope, $cordovaGeolocation ,$ionicLoading ,GetCurrentLocationService) {
   // var options = {timeout : 10000 , enableHighAccuracy : true};
   // $cordovaGeolocation.getCurrentPosition(options).then(function(position){
   //   //  var latlang=new google.maps.LatLang(position.coords.latitude , position.coords.longitude);
@@ -66,13 +66,28 @@ angular.module('starter.controllers', [])
       google.maps.event.addListener(marker , 'click' , function(){
         infoWindow.open($scope.map , marker);
       });
-
+	  
+		
     });
   }).catch(function(err){
     console.log(err);
   });
 
-
+	$scope.centerOnMe = function(){
+		  if(!$scope.map){
+			  return;
+		  }
+		  $scope.loading=$ionicLoading.show({
+		  showBackdrop : true
+	  });
+	   GetCurrentLocationService.then(function(pos) {
+    var LatLang = {lat : pos.lat , lng : pos.lng};
+	$scope.map.setCenter(new google.maps.LatLng(pos.lat , pos.lng));
+	$ionicLoading.hide();
+	   }).catch(err => {
+		   console.log(err);
+	   })
+	  };
 
 
 })
@@ -95,8 +110,8 @@ angular.module('starter.controllers', [])
 .controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
   $scope.chat = Chats.get($stateParams.chatId);
 })
-.controller('mAddCtrl' , ['$scope' , '$ionicModal' , '$cordovaGeolocation' ,'$firebaseObject' , '$firebaseArray' ,'PrayerTimingService' ,'GetCurrentLocationService',
-function($scope , $ionicModal , $cordovaGeolocation, $firebaseObject,$firebaseArray ,PrayerTimingService , GetCurrentLocationService){
+.controller('mAddCtrl' , ['$scope' , '$ionicModal' , '$ionicPopup','$cordovaGeolocation' ,'$firebaseObject' , '$firebaseArray' ,'PrayerTimingService' ,'GetCurrentLocationService',
+function($scope , $ionicModal ,$ionicPopup, $cordovaGeolocation, $firebaseObject,$firebaseArray ,PrayerTimingService , GetCurrentLocationService){
   //Create DB Ref..l̥ṣ.`
 
   const dbRefObject = firebase.database().ref().child('masjid');
@@ -134,16 +149,42 @@ function($scope , $ionicModal , $cordovaGeolocation, $firebaseObject,$firebaseAr
       // Execute action
    });
    $scope.submitMasjid=function(masjid){
-
-      console.log(PrayerTimingService.getSalah());
-      masjid.salahTime=PrayerTimingService.getSalah();
-      masjid.lat=GetCurrentLocationService.$$state.value.lat;
-      masjid.lng=GetCurrentLocationService.$$state.value.lng;
+		var confirmPopup = $ionicPopup.confirm({
+			title : `Add Masjid`,
+			template : `Are you sure you want to add ${masjid.name}`
+		});
+		confirmPopup.then(res => {
+			if(res){
+      
+	  masjid.lat=GetCurrentLocationService.$$state.value.lat;
+      
+	  masjid.lng=GetCurrentLocationService.$$state.value.lng;
+	  
+	  
        console.log(masjid);
+	   
       firebaseArrayRef= $firebaseArray(dbRefObject);
       firebaseArrayRef.$add(masjid).then(function(results){
-        console.log(results);
-      })
+		  console.log('deii')
+        console.log(results.key);
+		var keyRefObject=dbRefObject.child(results.key);
+		var geoFire = new GeoFire(keyRefObject);
+		geoFire.set("GeoLatLng" , [masjid.lat , masjid.lng]).then(()=>{
+			$ionicPopup.alert({
+				title : 'Success!!',
+				template : 'Masjid Added Successfully!!'
+			}).then(res => {
+				document.addForm.reset();
+				$scope.salah={};
+			});//ionicPopup
+		
+		});//geoFireSet
+		
+      })//angularfire$add
+	  } else {
+				return;
+			}
+		})
 
    }
    $scope.addPrayerTime=function(salah){
