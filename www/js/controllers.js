@@ -9,7 +9,7 @@ angular.module('starter.controllers', [])
   // } , function(err){
   //   console.log(err);
   // });//$cordovaGeolocation
-
+  const dbRefObject = firebase.database().ref().child('masjid');
   GetCurrentLocationService.then(function(pos) {
     var LatLang = {lat : pos.lat , lng : pos.lng};
 
@@ -66,8 +66,8 @@ angular.module('starter.controllers', [])
       google.maps.event.addListener(marker , 'click' , function(){
         infoWindow.open($scope.map , marker);
       });
-	  
-		
+
+
     });
   }).catch(function(err){
     console.log(err);
@@ -88,6 +88,28 @@ angular.module('starter.controllers', [])
 		   console.log(err);
 	   })
 	  };
+    GetCurrentLocationService.then(function(pos){
+      console.log("come");
+      dbRefObject.on("value", function(snapshot) {
+    console.log(snapshot.val());
+    snapshot.forEach(function(data) {
+        console.log(data.key);
+        keyRefObject=dbRefObject.child(data.key);
+        var geoFire = new GeoFire(keyRefObject);
+        var geoQuery = geoFire.query({
+          center : [pos.lat , pos.lng] ,
+          radius : 10.5
+        })
+        geoQuery.on("key_entered", function(key, location) {
+          console.log("Key is" +key+ " location is "+location);
+        })
+    });
+});
+
+
+    }).catch(err=> {
+      console.log(err);
+    })
 
 
 })
@@ -155,14 +177,14 @@ function($scope , $ionicModal ,$ionicPopup, $cordovaGeolocation, $firebaseObject
 		});
 		confirmPopup.then(res => {
 			if(res){
-      
+
 	  masjid.lat=GetCurrentLocationService.$$state.value.lat;
-      
+
 	  masjid.lng=GetCurrentLocationService.$$state.value.lng;
-	  
-	  
+
+
        console.log(masjid);
-	   
+
       firebaseArrayRef= $firebaseArray(dbRefObject);
       firebaseArrayRef.$add(masjid).then(function(results){
 		  console.log('deii')
@@ -177,9 +199,9 @@ function($scope , $ionicModal ,$ionicPopup, $cordovaGeolocation, $firebaseObject
 				document.addForm.reset();
 				$scope.salah={};
 			});//ionicPopup
-		
+
 		});//geoFireSet
-		
+
       })//angularfire$add
 	  } else {
 				return;
