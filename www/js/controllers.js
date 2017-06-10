@@ -1,18 +1,17 @@
-angular.module('starter.controllers', [])
+angular.module('starter.controllers', ['firebase'])
 
-.controller('MapCtrl', function($scope, $cordovaGeolocation ,$ionicLoading ,GetCurrentLocationService) {
-  // var options = {timeout : 10000 , enableHighAccuracy : true};
-  // $cordovaGeolocation.getCurrentPosition(options).then(function(position){
-  //   //  var latlang=new google.maps.LatLang(position.coords.latitude , position.coords.longitude);
-  //
-  //
-  // } , function(err){
-  //   console.log(err);
-  // });//$cordovaGeolocation
+.controller('MapCtrl', function($scope, $cordovaGeolocation ,$ionicLoading ,$firebaseArray ,GetCurrentLocationService) {
   const dbRefObject = firebase.database().ref().child('masjid');
+  const keyRefObject=firebase.database().ref().child('masjidGeoLocation');
+        firebaseArrayRef= $firebaseArray(dbRefObject);
+
   GetCurrentLocationService.then(function(pos) {
     var LatLang = {lat : pos.lat , lng : pos.lng};
-
+	var geoFire=new GeoFire(keyRefObject);
+		var geoQuery=geoFire.query({
+			center : [pos.lat , pos.lng],
+			radius : 10.5
+		});
     console.log(LatLang);
     // Wach Position for change
         var watchOptions = {timeout : 3000, enableHighAccuracy: false};
@@ -26,6 +25,9 @@ angular.module('starter.controllers', [])
               console.log(lat + '' + long)
               LatLang.lat=lat;
               LatLang.lng=long;
+			  geoQuery.updateCriteria({
+				  center: [lat, long]
+				});
            }
         ).catch(err => {
           console.log(err);
@@ -52,7 +54,7 @@ angular.module('starter.controllers', [])
   		fillOpacity: 1,
   		strokeColor: '',
   		strokeWeight: 0,
-      scale: 5
+		scale: 5
 
   	}
   	// map_icon_label: '<span class="map-icon map-icon-location-arrow"></span>'
@@ -66,12 +68,36 @@ angular.module('starter.controllers', [])
       google.maps.event.addListener(marker , 'click' , function(){
         infoWindow.open($scope.map , marker);
       });
+		
+		geoQuery.on("key_entered" , function(key , location , distance){
+			console.log(`Key is ${key} location is ${location} and distance is ${distance}`) ;
+			
+			var rec = firebaseArrayRef.$getRecord(key);
+			console.log(rec);
+			var markerLatLng=new google.maps.LatLng(location);
+			var masjidMarker=new Marker({
+				animation : google.maps.Animation.DROP,
+        position : LatLang ,
+		title : rec.name,
+        icon: {
+  		path: SQUARE_PIN,
+  		fillColor: '#0c60ee',
+  		fillOpacity: .5,
+  		strokeColor: '',
+  		strokeWeight: 0
 
+  	},
+  	 map_icon_label: '<span class="map-icon map-icon-convenience-store"></span>'
+			});
+			masjidMarker.setMap($scope.map);
+			
+		});
 
     });
   }).catch(function(err){
     console.log(err);
   });
+  
 
 	$scope.centerOnMe = function(){
 		  if(!$scope.map){
@@ -88,30 +114,6 @@ angular.module('starter.controllers', [])
 		   console.log(err);
 	   })
 	  };
-    GetCurrentLocationService.then(function(pos){
-      console.log("come");
-      dbRefObject.on("value", function(snapshot) {
-    console.log(snapshot.val());
-    snapshot.forEach(function(data) {
-        console.log(data.key);
-        keyRefObject=dbRefObject.child(data.key);
-        var geoFire = new GeoFire(keyRefObject);
-        var geoQuery = geoFire.query({
-          center : [pos.lat , pos.lng] ,
-          radius : 10.5
-        })
-        geoQuery.on("key_entered", function(key, location) {
-          console.log("Key is" +key+ " location is "+location);
-        })
-    });
-});
-
-
-    }).catch(err=> {
-      console.log(err);
-    })
-
-
 })
 
 .controller('ChatsCtrl', function($scope, Chats) {
@@ -189,9 +191,9 @@ function($scope , $ionicModal ,$ionicPopup, $cordovaGeolocation, $firebaseObject
       firebaseArrayRef.$add(masjid).then(function(results){
 		  console.log('deii')
         console.log(results.key);
-		var keyRefObject=dbRefObject.child(results.key);
+		var keyRefObject=firebase.database().ref().child('masjidGeoLocation');
 		var geoFire = new GeoFire(keyRefObject);
-		geoFire.set("GeoLatLng" , [masjid.lat , masjid.lng]).then(()=>{
+		geoFire.set(results.key , [masjid.lat , masjid.lng]).then(()=>{
 			$ionicPopup.alert({
 				title : 'Success!!',
 				template : 'Masjid Added Successfully!!'
