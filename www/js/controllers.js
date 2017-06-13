@@ -68,10 +68,10 @@ angular.module('starter.controllers', ['firebase'])
       google.maps.event.addListener(marker , 'click' , function(){
         infoWindow.open($scope.map , marker);
       });
-		
+
 		geoQuery.on("key_entered" , function(key , location , distance){
 			console.log(`Key is ${key} location is ${location} and distance is ${distance}`) ;
-			
+
 			var rec = firebaseArrayRef.$getRecord(key);
 			console.log(rec);
 			var markerLatLng=new google.maps.LatLng(location);
@@ -82,7 +82,7 @@ angular.module('starter.controllers', ['firebase'])
         icon: {
   		path: SQUARE_PIN,
   		fillColor: '#0c60ee',
-  		fillOpacity: .5,
+  		fillOpacity: .8,
   		strokeColor: '',
   		strokeWeight: 0
 
@@ -90,14 +90,19 @@ angular.module('starter.controllers', ['firebase'])
   	 map_icon_label: '<span class="map-icon map-icon-convenience-store"></span>'
 			});
 			masjidMarker.setMap($scope.map);
-			
+
+      masjidMarker.addListener('click' , function(){
+        console.log('I am Tapped!!');
+        console.log(rec);
+      });
 		});
+
 
     });
   }).catch(function(err){
     console.log(err);
   });
-  
+
 
 	$scope.centerOnMe = function(){
 		  if(!$scope.map){
@@ -173,6 +178,13 @@ function($scope , $ionicModal ,$ionicPopup, $cordovaGeolocation, $firebaseObject
       // Execute action
    });
    $scope.submitMasjid=function(masjid){
+     console.log(PrayerTimingService.getSalah());
+     if(PrayerTimingService.getSalah()!=null){
+       masjid.salahTime=PrayerTimingService.getSalah();
+     }
+     if (!masjid.name) {
+       masjid.name='Masjid';
+     }
 		var confirmPopup = $ionicPopup.confirm({
 			title : `Add Masjid`,
 			template : `Are you sure you want to add ${masjid.name}`
@@ -180,8 +192,9 @@ function($scope , $ionicModal ,$ionicPopup, $cordovaGeolocation, $firebaseObject
 		confirmPopup.then(res => {
 			if(res){
 
+	  // masjid.lat=50.0630;
+	  // masjid.lng=19.945130;
 	  masjid.lat=GetCurrentLocationService.$$state.value.lat;
-
 	  masjid.lng=GetCurrentLocationService.$$state.value.lng;
 
 

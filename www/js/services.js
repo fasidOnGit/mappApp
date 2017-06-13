@@ -26,7 +26,7 @@ angular.module('starter.services', [])
 })
 .factory('PrayerTimingService' , [function(){
 
-  var salahTiming={};
+  var salahTiming;
   return {
     setSalah : function(salah){
         salahTiming=salah;
