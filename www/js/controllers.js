@@ -4,6 +4,8 @@ angular.module('starter.controllers', ['firebase'])
   const dbRefObject = firebase.database().ref().child('masjid');
   const keyRefObject=firebase.database().ref().child('masjidGeoLocation');
         firebaseArrayRef= $firebaseArray(dbRefObject);
+		
+	var masjidArr=[];
 
   GetCurrentLocationService.then(function(pos) {
     var LatLang = {lat : pos.lat , lng : pos.lng};
@@ -71,14 +73,33 @@ angular.module('starter.controllers', ['firebase'])
 
 		geoQuery.on("key_entered" , function(key , location , distance){
 			console.log(`Key is ${key} location is ${location} and distance is ${distance}`) ;
-
+			
+			var geoFired={
+				
+				'key' : key ,
+				'location' : location ,
+				'distance' : distance
+			};
+			
+			
 			var rec = firebaseArrayRef.$getRecord(key);
 			console.log(rec);
-			var markerLatLng=new google.maps.LatLng(location);
-			var masjidMarker=new Marker({
-				animation : google.maps.Animation.DROP,
-        position : LatLang ,
-		title : rec.name,
+			rec.geoFired=geoFired;
+			masjidArr.push(rec);
+			
+			console.log(location);
+			
+		});
+	
+	   geoQuery.on('ready' , function(){
+		   console.log('I am ready!!');
+		   console.log(masjidArr)
+		   angular.forEach(masjidArr , function(eachMasjid){
+			   var masjidMarker=new Marker({
+		map : $scope.map,
+		animation : google.maps.Animation.DROP,
+        position : new google.maps.LatLng(eachMasjid.geoFired.location[0] , eachMasjid.geoFired.location[1]) ,
+		title : eachMasjid.name,
         icon: {
   		path: SQUARE_PIN,
   		fillColor: '#0c60ee',
@@ -89,13 +110,16 @@ angular.module('starter.controllers', ['firebase'])
   	},
   	 map_icon_label: '<span class="map-icon map-icon-convenience-store"></span>'
 			});
-			masjidMarker.setMap($scope.map);
+			console.log(eachMasjid.geoFired.location);
+			/* masjidMarker.setMap($scope.map); */
 
       masjidMarker.addListener('click' , function(){
         console.log('I am Tapped!!');
-        console.log(rec);
+        console.log(eachMasjid);
       });
-		});
+		   });
+		   
+	   });
 
 
     });
@@ -192,8 +216,8 @@ function($scope , $ionicModal ,$ionicPopup, $cordovaGeolocation, $firebaseObject
 		confirmPopup.then(res => {
 			if(res){
 
-	  // masjid.lat=50.0630;
-	  // masjid.lng=19.945130;
+	   /* masjid.lat=12.915846
+	   masjid.lng=80.175579 */
 	  masjid.lat=GetCurrentLocationService.$$state.value.lat;
 	  masjid.lng=GetCurrentLocationService.$$state.value.lng;
 
