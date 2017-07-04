@@ -84,9 +84,10 @@ angular.module('starter.controllers', ['firebase'])
 			
 			var rec = firebaseArrayRef.$getRecord(key);
 			console.log(rec);
+			if( rec != null){
 			rec.geoFired=geoFired;
 			masjidArr.push(rec);
-			
+			}
 			console.log(location);
 			
 		});
