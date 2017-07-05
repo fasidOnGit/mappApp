@@ -1,10 +1,10 @@
 angular.module('starter.controllers', ['firebase'])
 
-.controller('MapCtrl', function($scope, $cordovaGeolocation ,$ionicLoading ,$firebaseArray ,GetCurrentLocationService) {
+.controller('MapCtrl', function($scope, $cordovaGeolocation ,$ionicLoading ,$firebaseArray , $ionicModal, $ionicPopup, GetCurrentLocationService) {
   const dbRefObject = firebase.database().ref().child('masjid');
   const keyRefObject=firebase.database().ref().child('masjidGeoLocation');
         firebaseArrayRef= $firebaseArray(dbRefObject);
-		
+
 	var masjidArr=[];
 
   GetCurrentLocationService.then(function(pos) {
@@ -73,15 +73,15 @@ angular.module('starter.controllers', ['firebase'])
 
 		geoQuery.on("key_entered" , function(key , location , distance){
 			console.log(`Key is ${key} location is ${location} and distance is ${distance}`) ;
-			
+
 			var geoFired={
-				
+
 				'key' : key ,
 				'location' : location ,
 				'distance' : distance
 			};
-			
-			
+
+
 			var rec = firebaseArrayRef.$getRecord(key);
 			console.log(rec);
 			if( rec != null){
@@ -89,37 +89,131 @@ angular.module('starter.controllers', ['firebase'])
 			masjidArr.push(rec);
 			}
 			console.log(location);
-			
+
 		});
-	
+
 	   geoQuery.on('ready' , function(){
 		   console.log('I am ready!!');
 		   console.log(masjidArr)
 		   angular.forEach(masjidArr , function(eachMasjid){
 			   var masjidMarker=new Marker({
-		map : $scope.map,
-		animation : google.maps.Animation.DROP,
-        position : new google.maps.LatLng(eachMasjid.geoFired.location[0] , eachMasjid.geoFired.location[1]) ,
-		title : eachMasjid.name,
-        icon: {
-  		path: SQUARE_PIN,
-  		fillColor: '#0c60ee',
-  		fillOpacity: .8,
-  		strokeColor: '',
-  		strokeWeight: 0
+          		map : $scope.map,
+          		animation : google.maps.Animation.DROP,
+              position : new google.maps.LatLng(eachMasjid.geoFired.location[0] , eachMasjid.geoFired.location[1]) ,
+          		title : eachMasjid.name,
+              icon: {
+            		path: SQUARE_PIN,
+            		fillColor: '#0c60ee',
+            		fillOpacity: .8,
+            		strokeColor: '',
+            		strokeWeight: 0
 
-  	},
-  	 map_icon_label: '<span class="map-icon map-icon-convenience-store"></span>'
-			});
+            	},
+            	 map_icon_label: '<span class="map-icon map-icon-convenience-store"></span>'
+  			});
 			console.log(eachMasjid.geoFired.location);
 			/* masjidMarker.setMap($scope.map); */
 
       masjidMarker.addListener('click' , function(){
         console.log('I am Tapped!!');
+        $scope.isGiven=true;
+
         console.log(eachMasjid);
+        $scope.eachMasjid=eachMasjid;
+        var myPopup = $ionicPopup.show({
+         template: `<i class="ion-android-walk"></i><span> Distance : ${eachMasjid.geoFired.distance.toFixed(2)} Kms <br>
+                      <i class="ion-woman"></i><span> Place for Women : ${eachMasjid.women} </span> <br>
+                      <table ng-if="eachMasjid" class="table table-striped">
+                        <thead>
+                        <th>Salah</th>
+                        <th>Adhaan</th>
+                        <th>Ikamath</th>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <th scope="row">Fajr</th>
+                            <td>{{eachMasjid.fajr.adhaan}}</td>
+                            <td>{{eachMasjid.fajr.ikamath}}</td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Dhuhar</th>
+                            <td>{{eachMasjid.dhuhar.adhaan}}</td>
+                            <td>{{eachMasjid.dhuhar.ikamath}}</td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Asar</th>
+                            <td>{{eachMasjid.asar.adhaan}}</td>
+                            <td>{{eachMasjid.asar.ikamath}}</td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Maghrib</th>
+                            <td>{{eachMasjid.maghrib.adhaan}}</td>
+                            <td>{{eachMasjid.maghrib.ikamath}}</td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Isha</th>
+                            <td>{{eachMasjid.isha.adhaan}}</td>
+                            <td>{{eachMasjid.isha.ikamath}}</td>
+                          </tr>
+                        </tbody>
+                      </table>`,
+         title: eachMasjid.name ,
+         subTitle: '<i class="ion-android-time"></i> <span style="font-weight : bold; color : red;"> Last Update On : '+eachMasjid.lastUpdate +'</span>',
+         scope: $scope,
+
+         buttons: [
+            {
+              text: 'Close'
+            },
+           {
+               text: '<b>Get Direction</b>',
+               type: 'button-positive',
+                  onTap: function(e) {
+                      //Learn Google Direction Services..
+                  }
+            }
+         ]
+      });
+      $scope.closePopup = function () {
+      myPopup.close();
+  };
+        // $ionicModal.fromTemplateUrl('templates/showMasjidDetailsModal.html' , {
+        //   scope: $scope,
+        //     animation: 'slide-in-up'
+        // }).then(function(modal){
+        //   $scope.modal=modal;
+        //   console.log($scope.modal);
+        //   $scope.openModal();
+        // });
+        // $scope.openModal=function(){
+        //   $scope.modal.show();
+        // };
+        //
+        // $scope.closeModal=function(){
+        //   $scope.modal.hide();
+        // };
+        // $scope.destroyModel=function(){
+        //   $scope.modal.remove();
+        // };
+        //
+        // //Cleanup the modal when we're done with it!
+        //  $scope.$on('$destroy', function() {
+        //     $scope.modal.remove();
+        //  });
+        //
+        //  // Execute action on hide modal
+        //  $scope.$on('modal.hidden', function() {
+        //     // Execute action
+        //  });
+        //
+        //  // Execute action on remove modal
+        //  $scope.$on('modal.removed', function() {
+        //     // Execute action
+        //  });
+
       });
 		   });
-		   
+
 	   });
 
 
@@ -144,6 +238,7 @@ angular.module('starter.controllers', ['firebase'])
 		   console.log(err);
 	   })
 	  };
+
 })
 
 .controller('ChatsCtrl', function($scope, Chats) {
@@ -222,6 +317,9 @@ function($scope , $ionicModal ,$ionicPopup, $cordovaGeolocation, $firebaseObject
 	  masjid.lat=GetCurrentLocationService.$$state.value.lat;
 	  masjid.lng=GetCurrentLocationService.$$state.value.lng;
 
+    //to See Last Update
+
+    masjid.lastUpdate=getDateFormat(new Date());
 
        console.log(masjid);
 
@@ -349,4 +447,8 @@ function log(message){
   var textNode = document.createTextNode(message);
   childDiv.appendChild(textNode);
   document.getElementById("log").appendChild(childDiv);
+}
+
+function getDateFormat(date){
+	return date ?  new Date(date).toDateString().slice(4, 15).replace(/\s/g,', ').replace(', ',' ') : new Date().toDateString().slice(4, 15).replace(/\s/g,', ').replace(', ',' ');
 }

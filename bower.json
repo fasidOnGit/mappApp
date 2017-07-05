@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "angularfire": "^2.3.0",
-    "geofire": "^4.1.2"
+    "geofire": "^4.1.2",
+    "bootstrap": "v4.0.0-alpha.6"
   }
 }
